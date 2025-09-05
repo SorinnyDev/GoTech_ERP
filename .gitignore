@@ -1,0 +1,48 @@
+node_modules/
+vendor/
+GotechCrawling/
+
+
+# 이미지 파일 무시
+*.jpg
+*.jpeg
+*.gif
+*.png
+
+# 실행파일 무시
+*.exe
+
+# next.ja build output
+/.next/
+
+# Excel 파일 무시
+*.xlsx
+*.xls
+*.xlsm
+*.xlsb
+*.xltx
+*.xlt
+*.csv
+
+# 로그 및 temp 파일 무시
+*.log
+*.tmp
+
+
+#특정 폴더 경로의 파일 전부 제외하기
+/upload/
+/plugin/
+/img/
+/install/
+/.vscode/
+/.idea/
+/xampp/
+/data/dbconfig.php
+/data/dbconfig.php.bak
+
+# 그누보드 관련
+/gnuboard/data/
+/gnuboard/cache/
+/gnuboard/skin/*/cache/
+/gnuboard/plugin/*/cache/
+

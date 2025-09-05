@@ -1,0 +1,71 @@
+@charset "utf-8";
+
+/* 최근게시물 갤러리 탭 슬라이더 스킨 (latest) */
+.pic_tab {height:auto;background:#fff}
+
+.pic_tab h2 {position:absolute;font-size:0;text-indent:-9999em;line-height:0;overflow:hidden}
+.pic_tab .bx-controls {display:none}
+.pic_tab .pic_tab_wrap {padding:17px 20px}
+.pic_tab .pic_tab_ul {position:relative;width:100%}
+.pic_tab .pic_tab_ul li:nth-child(4n) {clear:both}
+.pic_tab .pic_tab_ul li.empty_li {text-align:center !important;width:100% !important;line-height:300px}
+
+.pic_tab_heading {padding:0}
+.pic_tab_heading a {position:relative;display:inline-block;padding:15px 10px;text-align:left;border-bottom:0;font-size:1.2em;font-weight:bold;cursor:pointer}
+.pic_tab_heading h3 {display:inline-block;text-align:left;font-size:1.2em}
+.pic_tab_heading a.active {color:#f68931}
+.pic_tab_heading a.active:after {position:absolute;left:0;bottom:0;width:100%;height:3px;background:#f68931;content:'';z-index:9}
+.pic_tab_heading:after {display:block;visibility:hidden;clear:both;content:''}
+
+.gal_tab {clear:both;min-height:520px;border:1px solid #d9dee9;margin-bottom:20px;background:#fff}
+.gal_tab:after {display:block;visibility:hidden;clear:both;content:""}
+.gal_tab .lt_more {position:absolute;top:14px;right:10px;display:block;padding:2px 5px;line-height:15px;color:#17bb9c;border-radius:30px;text-align:center;border:1px solid #17bb9c;font-size:11px;font-weight:bold}
+.gal_tab .lt_more:hover {background:#17bb9c;color:#fff;border-color:#13ad90}
+
+.gal_tab ul li {display:block;float:left;width:33.333%;padding:15px 5px;text-align:left}
+.gal_tab ul li:after {display:block;visibility:hidden;clear:both;content:""}
+.gal_tab ul li .lt_img {display:block;width:100%;overflow:hidden}
+.gal_tab ul li .lt_img img {width:100%;height:auto}
+.gal_tab ul li .lt_tit {display:block;margin:5px 0;overflow:hidden}
+
+.gal_tab li a:hover {color:#3598dc}
+.gal_tab li .fa-heart {color:#ff0000}
+.gal_tab li .fa-lock {display:inline-block;width:16px;line-height:14px;font-size:0.833em;color:#fff;background:#262b88;text-align:center;border-radius:2px;font-size:12px;border:1px solid #262b88}
+.gal_tab li .new_icon {display:inline-block;width:16px;line-height:14px;font-size:0.833em;color:#fff;background:#3fd49e;border:1px solid #32c791;text-align:center;border-radius:2px;margin:5px 0 5px 3px}
+.gal_tab li .hot_icon {display:inline-block;width:16px;line-height:14px;font-size:0.833em;color:#fff;background:#ff7261;border:1px solid #e75341;text-align:center;border-radius:2px;margin:5px 0 5px 3px}
+.gal_tab li .fa-caret-right {color:#bbb}
+
+.lt_info li {display:inline-block;float:left;margin:2px 10px 0 0}
+.lt_info li:after {display:block;visibility:hidden;clear:both;content:""}
+.lt_nick {color:#999}
+.lt_nick img {border-radius:50%}
+
+.lt_info .lt_date {margin-left:5px;padding-left:8px;background:url('img/division-border.gif') left 4px no-repeat;color:#838383}
+.lt_info .lt_comnt {float:right;color:#026bee}
+.lt_info .cnt_cmt {display:inline-block;margin:0 5px 0 3px}
+
+@media (max-width:720px){
+	.gal_tab ul li {width:50%}
+	.pic_tab .pic_tab_ul li:nth-child(4n) {clear:inherit}
+	.pic_tab .pic_tab_ul li:nth-child(2n+1) {clear:both}
+}
+
+.tabs {}
+.tabs:after {display:block;visibility:hidden;clear:both;content:""}
+
+[role="tablist"] {position:relative;margin:0;padding:0 20px;overflow:visible;border-bottom:1px solid #e9e9e9}
+[role="tab"] {position:relative;float:left;margin:0;font-weight:bold;padding:16.5px 10px;border:0;background:#fff;overflow:visible}
+[role="tab"]:hover::before,
+[role="tab"]:focus::before,
+[role="tab"][aria-selected="true"]::before {position:absolute;bottom:-1px;top:0;right:0;left:0;border-bottom:3px solid #f68931;content:''}
+[role="tab"][aria-selected="true"] {outline:0}
+[role="tab"][aria-selected="true"]::after {}
+[role="tab"][aria-selected="true"]:not(:focus):not(:hover)::before {border-bottom:3px solid #f68931;height:49px}
+
+[role="tab"]:hover,
+[role="tab"]:focus,
+[role="tab"]:active {outline:0;border-radius:0;color:inherit}
+[role="tab"]:hover::before,
+[role="tab"]:focus::before {border-color:#f68931}
+
+[role="tabpanel"] {position:relative;z-index:2}

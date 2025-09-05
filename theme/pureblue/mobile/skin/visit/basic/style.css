@@ -1,0 +1,11 @@
+@charset "utf-8";
+
+#visit {margin-bottom:10px;padding:10px 20px;background:#fff;border:1px solid #d9dde3}
+#visit h2 {display:inline-block;float:left;color:#317af6;line-height:28px;font-size:1em;margin-right:20px}
+#visit h2 i {display:inline-block;margin-left:5px;color:#000;font-weight:bold}
+#visit dl {display:inline-block}
+#visit dl:after {display:block;visibility:hidden;clear:both;content:""}
+#visit dt {display:inline-block;font-size:1em;font-weight:normal;line-height:28px;padding-left:10px;margin-left:10px;background:url('img/division-border.gif') 0 center no-repeat}
+#visit dt:nth-of-type(1) {background:none;padding-left:0;margin-left:0}
+#visit dd {display:inline-block;font-size:1em;font-weight:bold;text-align:right}
+#visit a {display:inline-block;float:right;text-decoration:none;background:#f63e54;border:1px solid #ea283f;border-radius:3px;color:#fff;padding:6px 5px}

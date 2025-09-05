@@ -1,0 +1,37 @@
+@charset "utf-8";
+
+/* 최근게시물 갤러리 스킨 (latest) */
+.gall {position:relative;width:100%;height:auto !important;border:1px solid #d2dae5;overflow:hidden;margin-bottom:20px}
+.gall:after {display:block;visibility:hidden;clear:both;content:""}
+
+.gall h2 {position:absolute;font-size:0;text-indent:-9999em;line-height:0;overflow:hidden}
+.gall_lt li {position:relative;display:block;float:left;width:100%;text-align:left}
+.gall_lt li:after {display:block;visibility:hidden;clear:both;content:""}
+.gall_lt li .lt_img {display:block;width:100%;overflow:hidden;text-align:center;background:#eaeaea}
+.gall_lt li .lt_img img {width:100%}
+.gall_lt li .lt_tit {display:inline-block;overflow:hidden;color:#fff;font-size:2em}
+.gall_lt li .gall_cnt {position:absolute;left:0;bottom:0;width:100%;padding:20px;background:linear-gradient(to top, black, transparent)}
+.gall_lt li .no_img {display:inline-block;max-height:370px}
+.gall_lt li .fa-heart {color:#ff0000}
+.gall_lt li .fa-lock {display:inline-block;width:16px;line-height:14px;font-size:0.5em;color:#fff;background:#262b88;text-align:center;border-radius:2px;font-size:12px;border:1px solid #262b88;vertical-align:middle}
+.gall_lt li .new_icon {display:inline-block;width:16px;line-height:14px;font-size:0.5em;color:#fff;background:#3fd49e;border:1px solid #32c791;text-align:center;border-radius:2px;vertical-align:middle;margin-left:10px}
+.gall_lt li .hot_icon {display:inline-block;width:16px;line-height:14px;font-size:0.5em;color:#fff;background:#ff7261;border:1px solid #e75341;text-align:center;border-radius:2px;vertical-align:middle;margin-left:10px}
+.gall_lt li .fa-caret-right {color:#bbb}
+
+.gall_lt_info .lt_nick .sv_member {color:#fff !important}
+.gall_lt_info .lt_date {margin-left:10px;margin-right:10px;padding-left:10px;background:url('img/division-border.gif') left 4px no-repeat;color:#fff}
+.gall_lt_info .lt_comnt {color:#fff}
+.gall_lt_info .cnt_cmt {display:inline-block;margin:0 5px 0 3px}
+
+.gall .bx-controls-direction {width:100%;position:absolute;top:45%}
+.gall .bx-controls-direction i {font-size:2em;color:#fff}
+.gall .bx-next {position:absolute;right:0;display:inline-block;padding:10px;background:#7e8088;opacity:0.8;border-radius:3px 0 0 3px}
+.gall .bx-prev {position:absolute;left:0;display:inline-block;padding:10px;background:#7e8088;opacity:0.8;border-radius:0 3px 3px 0}
+
+@media (max-width:720px){
+	.lt {width:100% !important}
+	.gall_lt li .lt_tit {font-size:1.4em}
+	.gall_lt li .lt_img .no_img {width:100%;height:auto}
+	.gall_lt_info,.gall_lt_info a {font-size:0.725em !important}
+	.gall_lt_info i {display:inline-block;font-size:13px}
+}

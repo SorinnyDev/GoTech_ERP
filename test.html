@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8"> <!-- 여기에 UTF-8 인코딩 설정을 추가합니다. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter 키 입력 처리 예제</title>
+    <!-- jQuery 라이브러리 추가 (CDN 사용) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+        #myInputField {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 300px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="text" id="myInputField" placeholder="값을 입력하고 Enter를 누르세요.">
+
+    <script>
+        $(document).ready(function() {
+            // 유효한 옵션 목록 (예시 데이터)
+            var validOptions = [
+                "사과",
+                "바나나",
+                "오렌지",
+                "딸기",
+                "포도",
+                "키위"
+            ];
+
+            // 입력 필드에 키보드 이벤트 리스너 연결
+            $('#myInputField').on('keydown', function(event) {
+                // Enter 키(keyCode 13)가 눌렸는지 확인
+                if (event.keyCode === 13) {
+                    event.preventDefault(); // Enter 키의 기본 동작(예: 폼 제출) 방지
+
+                    var inputValue = $(this).val().trim(); // 입력된 값 가져오기 (앞뒤 공백 제거)
+
+                    // 입력된 값이 유효한 옵션 목록에 있는지 확인
+                    if (validOptions.includes(inputValue)) {
+                        // 값이 목록에 있으면 해당 값을 input 창에 다시 설정 (불필요해 보여도 명확성을 위해)
+                        $(this).val(inputValue);
+                        console.log("값이 목록에 있습니다: " + inputValue);
+                    } else {
+                        // 값이 목록에 없으면 '값 없음'으로 표시
+                        $(this).val('값 없음');
+                        console.log("값이 목록에 없습니다.");
+                    }
+
+                    // (선택 사항) 처리가 완료된 후 input 필드의 포커스를 유지하거나 다른 동작 수행
+                    $(this).blur(); // input 필드에서 포커스 제거
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

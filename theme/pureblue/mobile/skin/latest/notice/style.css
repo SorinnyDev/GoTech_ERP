@@ -1,0 +1,17 @@
+@charset "utf-8";
+
+/* 최근게시물 공지 스킨 (latest) */
+.notice:after {display:block;visibility:hidden;clear:both;content:""}
+.notice {clear:both;position:relative;padding:0 100px;margin-bottom:20px;height:60px;line-height:58px;overflow:hidden;border:1px solid #226ce9;background:#317af6}
+.notice li {text-overflow:ellipsis;overflow:hidden;white-space:nowrap;font-size:1.2em}
+.notice li a {float:left;color:#fff}
+.notice li .lock_icon {display:inline-block;line-height:14px;width:16px;font-size:0.833em;color:#4f818c;background:#cbe3e8;text-align:center;border-radius:2px;font-size:12px;border:1px solid #a2c6ce;vertical-align:top}
+.notice li .new_icon {line-height:16px;background:#3fd49e;border:1px solid #32c791;font-size:0.833em;color:#fff;padding:0 5px;width:16px;height:16px;border-radius:3px;margin-left:5px;text-align:center;vertical-align:middle}	
+.notice li .cnt_cmt {line-height:16px;background:#fff;border:1px solid #cdcdcd;font-size:0.833em;color:#3598dc;padding:0 5px;width:16px;height:16px;border-radius:10px;margin-left:5px;text-align:center;vertical-align:middle}
+
+.notice h2 {display:inline-block;position:absolute;left:0;line-height:58px;padding:0 20px;font-size:1.2em}
+.notice h2 a {display:inline-block;line-height:35px;border-radius:25px;color:#fff;text-align:center;color:#fff}
+.notice h2 i {display:inline-block;margin-left:5px}
+.notice .bx-controls a {color:#fff;font-size:1.5em}
+.notice .bx-next {position:absolute;top:24px;right:10px;width:35px;height:35px;line-height:30px;text-align:center;border:1px solid #639cfe;margin-top:-12px}
+.notice .bx-prev {position:absolute;top:24px;right:44px;width:35px;height:35px;line-height:30px;text-align:center;border:1px solid #639cfe;margin-top:-12px}

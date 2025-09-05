@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>쇼피파이 상품명 검색</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      #searchContainer {
+        margin-bottom: 20px;
+      }
+      #searchTerm {
+        padding: 8px;
+        width: 300px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      #searchButton {
+        padding: 8px 15px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      #searchButton:hover {
+        background-color: #0056b3;
+      }
+      #resultsContainer {
+        border-top: 1px solid #eee;
+        padding-top: 20px;
+        margin-top: 20px;
+      }
+      .product-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 15px;
+        padding: 10px;
+        border: 1px solid #f0f0f0;
+        border-radius: 5px;
+        background-color: #fff;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .product-item img {
+        width: 100px;
+        height: 100px;
+        object-fit: contain;
+        margin-right: 15px;
+        border-radius: 3px;
+        background-color: #fff;
+      }
+      .product-info {
+        flex-grow: 1;
+      }
+      .product-info h3 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        color: #333;
+        font-size: 1.1em;
+      }
+      .product-info p {
+        margin-bottom: 3px;
+        color: #666;
+        font-size: 0.9em;
+        line-height: 1.4;
+      }
+      .product-info p a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .product-info p a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>쇼피파이 상품명 검색</h1>
+
+    <div id="searchContainer">
+      <input
+        type="text"
+        id="searchTerm"
+        placeholder="상품명 입력 (예: T-Shirt)"
+      />
+      <button id="searchButton">검색</button>
+    </div>
+
+    <div id="resultsContainer">
+      <!-- 검색 결과가 여기에 동적으로 표시됩니다. -->
+      <p>검색어를 입력하고 '검색' 버튼을 눌러보세요.</p>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        // 이 API_KEY는 클라이언트가 백엔드 API (api/shopify_product_search.php)에 접근하는 인증용입니다.
+        // 백엔드 PHP 스크립트에서 이 헤더를 검증하도록 로직을 추가하지 않았다면 이 변수는 필수가 아닙니다.
+        // 필요하다면 백엔드 PHP에서 API_KEY 검증 로직을 추가하세요.
+        const CLIENT_TO_BACKEND_API_KEY = "key_I1ddjWG1JvLL0bB5hIDTYGaC6WO2Qw"; // 백엔드와 합의된 키
+
+        $("#searchButton").on("click", function () {
+          const searchTerm = $("#searchTerm").val().trim(); // 입력값 앞뒤 공백 제거
+          if (!searchTerm) {
+            alert("검색어를 입력해 주세요.");
+            return;
+          }
+
+          $("#resultsContainer").html("<p>상품을 검색 중입니다...</p>");
+
+          $.ajax({
+            url: "/price/shopify_product_search.php", // 백엔드 PHP 엔드포인트 URL (실제 경로에 맞게 변경)
+            method: "GET", // 상품 검색은 GET 요청 (쿼리 파라미터로 searchTerm 전달)
+            data: { searchTerm: searchTerm }, // 'searchTerm' 파라미터로 백엔드에 전송
+            headers: { "X-API-KEY": CLIENT_TO_BACKEND_API_KEY }, // 백엔드 인증 헤더 (선택 사항)
+            success: function (response) {
+              $("#resultsContainer").empty();
+
+              if (
+                response.status === "success" &&
+                response.data.data.products.length > 0
+              ) {
+                let products = response.data.data.products;
+
+                products.forEach((product) => {
+                  const imageUrl =
+                    product.image_url && product.image_url !== "no_image.png"
+                      ? product.image_url
+                      : "path/to/default_no_image.png";
+                  const productDetailUrl = product.online_store_url;
+
+                  // Variants 정보를 동적으로 생성
+                  let variantsHtml = "";
+                  if (product.variants && product.variants.length > 0) {
+                    variantsHtml += "<p><strong>배리언트 정보:</strong></p>";
+                    variantsHtml += "<ul>";
+                    product.variants.forEach((variant) => {
+                      variantsHtml += `
+                        <li>
+                            ID: ${variant.id} |
+                            제목: ${variant.title} |
+                            가격: ${variant.price} |
+                            SKU: ${variant.sku}
+                        </li>
+                    `;
+                    });
+                    variantsHtml += "</ul>";
+                  } else {
+                    variantsHtml += "<p>배리언트 정보 없음</p>";
+                  }
+
+                  let productHtml = `
+                <div class="product-item">
+                    <img src="${imageUrl}" alt="${product.title}">
+                    <div class="product-info">
+                        <h3>${product.title}</h3>
+                        <p><strong>상품 ID:</strong> ${product.id}</p>
+                        <p><strong>대표 가격:</strong> ${product.price}</p>
+                        <p><strong>타입:</strong> ${product.product_type}</p>
+                        <p><strong>API 호출 제한:</strong> ${product.api_call_limit}</p>
+                        <p><a href="${productDetailUrl}" target="_blank">온라인 스토어 보기</a></p>
+                        ${variantsHtml} <!-- <--- 여기에 variantsHtml 삽입! -->
+                    </div>
+                </div>
+            `;
+                  $("#resultsContainer").append(productHtml);
+                });
+              } else {
+                // 검색 결과가 없거나 오류가 발생했을 때
+                const message =
+                  response.message ||
+                  "검색 결과가 없거나 서버에서 오류가 발생했습니다.";
+                $("#resultsContainer").html(`<p>${message}</p>`);
+                console.log("Server Response:", response);
+              }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              $("#resultsContainer").html(
+                "<p>검색 요청 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.</p>"
+              );
+              console.error(
+                "AJAX Error:",
+                textStatus,
+                errorThrown,
+                jqXHR.responseText
+              );
+            },
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
