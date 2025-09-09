@@ -37,6 +37,7 @@ GotechCrawling/
 /.vscode/
 /.idea/
 /xampp/
+/data/cache/
 /data/dbconfig.php
 /data/dbconfig.php.bak
 
