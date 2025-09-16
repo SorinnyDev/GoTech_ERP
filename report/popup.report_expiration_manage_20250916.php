@@ -11,15 +11,41 @@ $seq_list = explode(',', $seqs);
 
 $product_rack_list = [];
 foreach ($seq_list as $seq) {
-  $sql = "
+  /*$sql = "
     select rs.wr_rack, rs.wr_warehouse, wp.wr_1, wp.wr_subject, r.gc_name, rep.id as 'expired_id', wp.wr_id, rep.expired_date from g5_rack_stock as rs
     left join g5_write_product as wp on rs.wr_product_id = wp.wr_id
     left join g5_rack as r on r.seq = rs.wr_rack
-    left join g5_rack_expired as rep on rep.rack_id = r.seq and rep.product_id = rs.wr_product_id                                                                                                     
-    where rs.wr_product_id = '{$seq}'  
-  ";
+    left join g5_rack_expired as rep on rep.rack_id = r.seq and rep.product_id = rs.wr_product_id
+    where rs.wr_product_id = '{$seq}'";*/
+
+$sql = "
+    SELECT 
+        s2.wr_rack, 
+        s2.wr_warehouse, 
+        wp.wr_1, 
+        wp.wr_subject, 
+        r.gc_name, 
+        rep.id as 'expired_id', 
+        wp.wr_id, 
+        rep.expired_date,
+        s2.seq as sales2_seq
+    FROM g5_sales2_list as s2
+    LEFT JOIN g5_write_product as wp ON s2.wr_product_id = wp.wr_id
+    LEFT JOIN g5_rack as r ON r.seq = s2.wr_rack
+    LEFT JOIN g5_rack_expired as rep ON rep.sales2_seq = s2.seq
+    WHERE s2.wr_product_id = '{$seq}'
+    AND s2.wr_chul_ea > 0";
+
+
+  if($search_expired == 'Y' && $expired_st_date && $expired_ed_date)
+      $sql .= " AND rep.expired_date BETWEEN '{$expired_st_date}' AND '{$expired_ed_date}' ";
+
+    $sql .= " GROUP BY s2.wr_rack, s2.wr_warehouse, wp.wr_1, wp.wr_subject, r.gc_name, rep.id, wp.wr_id, rep.expired_date, s2.seq";
+
   $rack_list = sql_fetch_all($sql);
 
+
+  $expired_array = [];
   foreach ($rack_list as $rack) {
     $wr_rack = $rack['wr_rack'];
     $sku = $rack['wr_1'];
@@ -29,21 +55,30 @@ foreach ($seq_list as $seq) {
     $gc_name = $rack['gc_name'];
     $expired_date = $rack['expired_date'];
     $gc_is_expired = !!$rack['expired_id'];
+      $sales2_seq = $rack['sales2_seq'];
 
-    $sql = "SELECT SUM(wr_stock) AS total FROM g5_rack_stock WHERE wr_product_id = '{$seq}' AND wr_rack = '{$wr_rack}' ORDER BY seq ASC ";
+    //$sql = "SELECT SUM(wr_stock) AS total FROM g5_rack_stock WHERE wr_product_id = '{$seq}' AND wr_rack = '{$wr_rack}' ORDER BY seq ASC, rep.expired_date desc";
+      $sql = "SELECT SUM(wr_chul_ea) AS total FROM g5_sales2_list WHERE wr_product_id = '{$seq}' AND wr_rack = '{$wr_rack}' AND wr_chul_ea > 0";
     $total = sql_fetch($sql)['total'];
 
-    if($total > 0){
-      $product_rack_list[$wr_rack]['warehouse'] = PLATFORM_TYPE[$warehouse];
-      $product_rack_list[$wr_rack]['rack_name'] = $gc_name;
-      $product_rack_list[$wr_rack]['seq'] = $wr_rack;
-      $product_rack_list[$wr_rack]['total'] = number_format($total);
-      $product_rack_list[$wr_rack]['product_nm'] = $subject;
-      $product_rack_list[$wr_rack]['product_id'] = $product_id;
-      $product_rack_list[$wr_rack]['sku'] = $sku;
-      $product_rack_list[$wr_rack]['is_expired'] = $gc_is_expired;
-      $product_rack_list[$wr_rack]['expired_date'] = $expired_date;
-    }
+      if($total >= 0 ) {
+          // $temp_data 대신, $product_rack_list[$wr_rack]에 직접 값을 할당합니다.
+          $product_rack_list[$wr_rack]['warehouse'] = PLATFORM_TYPE[$warehouse];
+          $product_rack_list[$wr_rack]['rack_name'] = $gc_name;
+          $product_rack_list[$wr_rack]['seq'] = $wr_rack;
+          $product_rack_list[$wr_rack]['total'] = number_format($total);
+          $product_rack_list[$wr_rack]['product_nm'] = $subject;
+          $product_rack_list[$wr_rack]['product_id'] = $product_id;
+          $product_rack_list[$wr_rack]['sku'] = $sku;
+          $product_rack_list[$wr_rack]['is_expired'] = $gc_is_expired;
+          $product_rack_list[$wr_rack]['expired_date'] = $expired_date;
+          $product_rack_list[$wr_rack]['sales2_seq'] = $sales2_seq;
+
+          // 만료일 정보가 있는 경우에만 expired_array에 해당 데이터를 추가합니다.
+          if ($gc_is_expired) {
+              $expired_array[] = $product_rack_list[$wr_rack];
+          }
+      }
   }
 }
 
@@ -170,12 +205,12 @@ foreach ($seq_list as $seq) {
                        maxlength="20" placeholder="" style="text-align:center">
               </td>
               <td>
-                <?php if ($row['is_expired']) { ?>
-                  <a href="#" onclick="update_rack_expired_status(this, '<?= $row['rack_name']; ?>', '<?= $row['seq']; ?>', '<?= $row['product_id']; ?>', true)" class="btn btn_b02" style="background: #FF3746; color: white;">해제</a>
-                <?php } else { ?>
-                  <a href="#" onclick="update_rack_expired_status(this, '<?= $row['rack_name']; ?>', '<?= $row['seq']; ?>', '<?= $row['product_id']; ?>')" class="btn btn_b01" style="color: white;">등록</a>
-                <?php } ?>
-              </td>
+  <?php if ($row['is_expired']) { ?>
+    <a href="#" onclick="update_rack_expired_status(this, '<?= $row['rack_name']; ?>', '<?= $row['seq']; ?>', '<?= $row['product_id']; ?>', '<?= $row['sales2_seq']; ?>', true)" class="btn btn_b02" style="background: #FF3746; color: white;">해제</a>
+  <?php } else { ?>
+    <a href="#" onclick="update_rack_expired_status(this, '<?= $row['rack_name']; ?>', '<?= $row['seq']; ?>', '<?= $row['product_id']; ?>', '<?= $row['sales2_seq']; ?>')" class="btn btn_b01" style="color: white;">등록</a>
+  <?php } ?>
+</td>
             </tr>
           <?php } ?>
           </tbody>
@@ -186,7 +221,7 @@ foreach ($seq_list as $seq) {
 
 </div>
 <script>
-  function update_rack_expired_status($this, rack_name, seq, product_id, is_delete = false) {
+  function update_rack_expired_status($this, rack_name, seq, product_id, sales2_seq, is_delete = false) {
     if (is_delete) {
       if (!confirm('[' + rack_name + ']을 유통기한 임박 랙에서 해제하시겠습니까?')) {
         return;
@@ -204,7 +239,7 @@ foreach ($seq_list as $seq) {
       return;
     }
 
-    $.post('./ajax.rack_update_expired_status.php', {seq, product_id, expired_date}, function (result) {
+    $.post('./ajax.rack_update_expired_status.php', {seq, product_id, sales2_seq, expired_date}, function (result) {
       if (result === 'Y') {
         alert('저장되었습니다. 재고보고서에서 새로고침해주세요.');
         location.reload();
