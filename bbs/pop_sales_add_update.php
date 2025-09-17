@@ -1273,12 +1273,12 @@ if ($is_upload_file) {
         }
       }
 
-      #dodoskin 특송 80$ 이상, US 건 일 경우 특송처리
-      //if ($express_ordernum && $total_wr_14 > 80) {
-        if ($express_ordernum ) {
-        $query = "UPDATE g5_write_sales set wr_20 = '0001' where wr_subject like '%$express_ordernum%' limit $cnt ";
-        sql_query($query);
-      }
+        #dodoskin 특송 80$ 이상, US 건 일 경우 특송처리
+        # 2025-09-17 $80이상 특송 조건 삭제 수정
+        //if ($express_ordernum && $total_wr_14 > 80) {
+        //  $query = "UPDATE g5_write_sales set wr_20 = '0001' where wr_subject like '%$express_ordernum%' limit $cnt ";
+        //  sql_query($query);
+        //}
     }
 
   }
