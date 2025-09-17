@@ -159,39 +159,99 @@ if ($is_upload_file) {
 
       $wr_36 = 0; // 수수료2
 
-      switch ($shippingmethod) {
+       /*
+        * 2025-09-16 기존 사용하던 엑셀 문구 비교 -> 문구 변경으로 인한 코드 수정
+       switch ($shippingmethod) {
 
-        case "Expedited Shipping ( 5 ~ 7 Business Days)" :
-          $wr_20 = "0001";
-          break;
-        case "Standard (15 ~ 25 Business Days)" :
-          $wr_20 = "0003";
-          break;
-        case "Standard Shipping ( 15 ~ 30 Business Days)" :
-          $wr_20 = "0002";
-          break;
-        case "Express from USA shipping (3 to 7 Business Days)" :
-          $wr_20 = "0003";
-          break;
-        case "Shipping" :
-          $wr_20 = "0003";
-          break;
-        case "USA 3 Days shipping (3 to 7 Business Days)" :
-          $wr_20 = "0003";
-          break;
-        case "Economy Shipping ( 15 ~ 30 Business Days ) - No tracking number" :
-          $wr_20 = "0006";
-          break;
+            case "Expedited Shipping ( 5 ~ 7 Business Days)" :
+                $wr_20 = "0001";
+                break;
+            case "Standard (15 ~ 25 Business Days)" :
+                $wr_20 = "0003";
+                break;
+            case "Standard Shipping ( 15 ~ 30 Business Days)" :
+                $wr_20 = "0002";
+                break;
+            case "Express from USA shipping (3 to 7 Business Days)" :
+                $wr_20 = "0003";
+                break;
+            case "Shipping" :
+                $wr_20 = "0003";
+                break;
+            case "USA 3 Days shipping (3 to 7 Business Days)" :
+                $wr_20 = "0003";
+                break;
+            case "Economy Shipping ( 15 ~ 30 Business Days ) - No tracking number" :
+                $wr_20 = "0006";
+                break;
 
-        default :
-          $wr_20 = "";
-          break;
+            default :
+                $wr_20 = "";
+                break;
+        }
 
-      }
-
-      if ($wr_14 > 80 && $wr_32 == 'US') {
+        if ($wr_14 > 80 && $wr_32 == 'US') {
         $wr_20 = "0001";
       }
+       */
+
+       /* if (strpos($shippingmethod, 'Expedited') !== false) {
+            // shippingmethod에 'Expedited'가 포함된 경우
+            $wr_20 = '0001';
+        } elseif (strpos($shippingmethod, 'Standard') !== false) {
+
+            // shippingmethod에 'Standard'가 포함된 경우
+            if ($wr_32 == 'US') {
+                // AQ열의 값이 'US'인 경우
+                $wr_20 = '0003';
+            } else {
+                // AQ열의 값이 'US'가 아닌 경우
+                $wr_20 = '0002';
+            }
+        } else {
+            // 위 조건에 모두 해당하지 않는 경우
+            $wr_20 = '';
+        }*/
+
+        $expl_shippingmethod = explode(" ",trim($shippingmethod))[0];
+
+        echo "<script>console.log('=== 행 " . $i . " 처리 시작 ===');</script>";
+        echo "<script>console.log('주문번호: " . addslashes($wr_subject) . "');</script>";
+        echo "<script>console.log('shippingmethod: " . addslashes($shippingmethod) . "');</script>";
+        echo "<script>console.log('첫단어: " . addslashes($expl_shippingmethod) . "');</script>";
+        echo "<script>console.log('국가: " . addslashes($wr_32) . "');</script>";
+
+
+        if( strcasecmp($expl_shippingmethod, 'Expedited') == 0 ) {
+
+            // shippingmethod에 'Expedited'가 포함된 경우
+            $wr_20 = '0001';
+            echo "<script>console.log('Expedited 조건 -> wr_20 = 0001');</script>";
+
+        }else if( strcasecmp($expl_shippingmethod, 'Standard') == 0 ){
+
+            echo "<script>console.log('Standard 조건 진입');</script>";
+
+            if ($wr_32 == 'US') {
+                // AQ열의 값이 'US'인 경우
+                $wr_20 = '0003';
+                echo "<script>console.log('US 조건 -> wr_20 = 0003');</script>";
+            } else {
+                // AQ열의 값이 'US'가 아닌 경우
+                $wr_20 = '0002';
+                echo "<script>console.log('비US 조건 -> wr_20 = 0002');</script>";
+            }
+
+        }else {
+            // 위 조건에 모두 해당하지 않는 경우
+            $wr_20 = '';
+            echo "<script>console.log('조건 불일치 -> wr_20 = 빈값');</script>";
+        }
+
+        echo "<script>console.log('wr_20 설정 후: " . $wr_20 . "');</script>";
+
+
+
 
 
     } else if ($domain == "Ebay") {
@@ -1214,7 +1274,8 @@ if ($is_upload_file) {
       }
 
       #dodoskin 특송 80$ 이상, US 건 일 경우 특송처리
-      if ($express_ordernum && $total_wr_14 > 80) {
+      //if ($express_ordernum && $total_wr_14 > 80) {
+        if ($express_ordernum ) {
         $query = "UPDATE g5_write_sales set wr_20 = '0001' where wr_subject like '%$express_ordernum%' limit $cnt ";
         sql_query($query);
       }
