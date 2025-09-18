@@ -127,6 +127,10 @@ for($i=0; $i<$count; $i++) {
 				$sql = "DELETE FROM g5_sales2_list WHERE seq='{$row2['seq']}'";
 				sql_query($sql);
 
+                // 해당 입고건과 연결된 유통기한 데이터 삭제
+                $sql_expired = "DELETE FROM g5_rack_expired WHERE sales2_seq = '{$row2['seq']}'";
+                sql_query($sql_expired);
+
 				$sql = "INSERT INTO g5_del_history(query_string,params,mb_id,reg_date,wr_order_num)VALUES('".addslashes($sql)."','".addslashes(json_encode($_REQUEST))."','".$member['mb_id']."',NOW(),'".$obj['wr_order_num']."')";
 				sql_query($sql);
 			}
@@ -136,6 +140,10 @@ for($i=0; $i<$count; $i++) {
 			if($row2['seq']){
 				$sql = "DELETE FROM g5_sales2_list WHERE seq='{$row2['seq']}'";
 				sql_query($sql);
+
+                // 해당 입고건과 연결된 유통기한 데이터 삭제
+                $sql_expired = "DELETE FROM g5_rack_expired WHERE sales2_seq = '{$row2['seq']}'";
+                sql_query($sql_expired);
 
 				$sql = "INSERT INTO g5_del_history(query_string,params,mb_id,reg_date,wr_order_num)VALUES('".addslashes($sql)."','".addslashes(json_encode($_REQUEST))."','".$member['mb_id']."',NOW(),'".$obj['wr_order_num']."')";
 				sql_query($sql);
@@ -226,6 +234,7 @@ for($i=0; $i<$count; $i++) {
         sql_query("delete from g5_sales1_list where wr_order_num = '{$obj['wr_order_num']}' ");
         sql_query("delete from g5_sales2_list where wr_order_num = '{$obj['wr_order_num']}' ");
         sql_query("delete from g5_sales3_list where wr_order_num = '{$obj['wr_order_num']}' ");
+
 
         sql_query("UPDATE g5_board SET bo_count_write = bo_count_write - 1 WHERE bo_table = 'sales' ");
         // $seq0 = sql_fetch("select wr_id from g5_sales1_list where seq = '{$obj['wr_id']}'")['wr_id'];

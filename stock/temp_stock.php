@@ -213,7 +213,7 @@ $usa_seq_options = json_encode($usa_seq_array);
 						if ($mb_id) $sql_search .= " and c.mb_id = '{$mb_id}' ";
 						if ($release == 3) $sql_search .= " and b.wr_etc_use = '1' ";
 
-						$sql = "SELECT a.*, b.wr_domain, b.seq, b.wr_order_num, b.wr_ea, b.wr_etc_use,
+						$sql = "SELECT a.*, b.wr_domain, b.seq, b.wr_order_num, b.wr_ea, b.wr_etc_use, b.expired_date,
 											c.wr_subject, c.wr_1, c.wr_37, c.wr_id, c.mb_id, c.wr_rack, c.wr_warehouse
 										FROM g5_temp_warehouse a
 										LEFT JOIN g5_sales2_list b ON(a.sales2_id = b.seq)
@@ -273,7 +273,7 @@ $usa_seq_options = json_encode($usa_seq_array);
 								</td>
 
 								<td class="cnt_left" style="width:80px;text-align:center;">
-									<input type="date" style="width:100%;text-align:center;" name="expired[<?= $i ?>]" class="expired">
+									<input type="date" style="width:100%;text-align:center;" name="expired[<?= $i ?>]" class="expired" value="<?= $row['expired_date'] ?>">
 								</td>
 
 								<td class="cnt_left" style="width:100px;text-align:center">
@@ -526,6 +526,8 @@ $usa_seq_options = json_encode($usa_seq_array);
 				return false;
 			}
 
+            console.log("seq : " + id + ", sid : " + sid + ", wr_id : " + wr_id + ", warehouse : " + warehouse + ", stock : " + stock + ", rack : "+rack + ", expired : " + expired + ", rack_seq : " + rack_seq);
+
 			$.post('./temp_stock_update.php', {
 				seq: id,
 				sid: sid,
@@ -533,7 +535,7 @@ $usa_seq_options = json_encode($usa_seq_array);
 				warehouse: warehouse,
 				stock: stock,
 				rack: rack,
-				expired,
+                expired: expired,
 				rack_seq: rack_seq
 			}, function(data) {
 				if (data == "y") {
@@ -542,7 +544,9 @@ $usa_seq_options = json_encode($usa_seq_array);
 				} else if (data == "nn") {
 					alert('창고지정이 잘못되었습니다. 개발자에게 문의하세요.');
 				} else {
-					alert('처리 중 오류가 발생했습니다.\n일시적 오류이거나 다른 담당자가 재고를 이관시켰을 경우입니다.\n새로고침 하신 뒤 재고를 확인하신 후 다시 시도해주세요.');
+					//alert('처리 중 오류가 발생했습니다.\n일시적 오류이거나 다른 담당자가 재고를 이관시켰을 경우입니다.\n새로고침 하신 뒤 재고를 확인하신 후 다시 시도해주세요.');
+                    alert('처리 중 오류가 발생했습니다.\n' + data);
+
 					$(this).attr('disabled', false);
 				}
 			});

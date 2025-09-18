@@ -92,6 +92,7 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
               <th style="width:70px">한국재고</th>
               <th style="width:70px">발주수량</th>
               <th style="width:70px">주문수량</th>
+              <th style="width:70px">유통기한</th>
 
               <th style="width:150px">주문자명</th>
               <th style="width:70px">단가</th>
@@ -125,12 +126,20 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
 
             $sql_search .= " and a.wr_warehouse != '3000'";
             if ($sql_search) {
-              $sql = "select * from g5_sales1_list a
+
+                /*$sql = "select * from g5_sales1_list a
               LEFT JOIN g5_write_product b ON b.wr_id=a.wr_product_id
-              
-              where (1) {$sql_search} and a.wr_date != '' and wr_chk = 0 order by a.seq desc";
-              //echo $sql;
+
+              where (1) {$sql_search} and a.wr_date != '' and wr_chk = 0 order by a.seq desc";*/
+
+                $sql = "select a.*,b.*
+                        from g5_sales1_list a
+                        LEFT JOIN g5_write_product b ON b.wr_id=a.wr_product_id 
+                        where (1) {$sql_search} and a.wr_chk = 0 order by a.seq desc";
+
+
               $rst = sql_query($sql);
+
               for ($i = 0; $row = sql_fetch_array($rst); $i++) {
 
                 /*$item = sql_fetch("select * from g5_write_product where (wr_1 = '".addslashes($row['wr_code'])."' or wr_27 = '".addslashes($row['wr_code'])."' or wr_28 = '".addslashes($row['wr_code'])."' or wr_29 = '".addslashes($row['wr_code'])."' or wr_30 = '".addslashes($row['wr_code'])."' or wr_31 = '".addslashes($row['wr_code'])."') ");*/
@@ -183,6 +192,9 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
                   <td style="text-align:right;"><?php echo $row['wr_32'] ?></td>
                   <td style="text-align:right;<?php echo $ea_chk ?>"><?php echo $row['wr_order_ea'] ?></td>
                   <td style="text-align:right"><?php echo $row['wr_ea'] ?></td>
+                  <td style="text-align:center">
+                      <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input">
+                  </td>
 
                   <td><?php echo $row['wr_mb_name'] ?></td>
                   <td style="text-align:right"><?php echo $row['wr_danga'] ?></td>

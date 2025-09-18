@@ -139,6 +139,7 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
 					<li style="width:100px">배송요금</li>
 					<li style="width:100px">주문자ID</li>
 					<li style="width:100px">주문자명</li>
+                    <li style="width:100px">유통기한</li>
 				</ul>
 
 				<div id="bo_li_01" class="list_03">
@@ -215,6 +216,7 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
 								<div class="cnt_left" style="width:100px;text-align:right"><?php echo $row['wr_delivery_fee'] ?></div>
 								<div class="cnt_left" style="width:100px;"><?php echo $row['wr_mb_id'] ?></div>
 								<div class="cnt_left" style="width:100px;"><?php echo $row['wr_mb_name'] ?></div>
+                                <div class="cnt_left" style="width:100px;"><?php echo $row['expired_date'] ?></div>
 
 								<!-- 
 				        // 추천, 비추천 
