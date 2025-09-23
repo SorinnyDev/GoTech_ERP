@@ -78,6 +78,7 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 	            <li style="width:100px">이관수량</li>
 	            <li style="width:100px">처리자</li>
 	            <li style="width:150px">입고 랙 선택</li>
+                <li style="width:150px">유통기한</li>
 	            <li style="width:120px">관리</li>
 	        </ul>
 	        <div id="bo_li_01" class="list_03" >
@@ -161,11 +162,17 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 						</select>
 						
 						</div>
+
+                        <div class="cnt_left" style="width:120px;text-align:center">
+
+                            <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input" max="9999-12-31">
+                        </div>
+
 		            	 <div class="cnt_left" style="width:120px;text-align:center">
 							<?php if($row['wr_state'] == 1){?>
 							<strong style="color:green;line-height:1.0em" title="<?php echo $row['wr_state_date']?>">이관완료</strong>
 							<?php } else {?>
-							<button type="button" class="btn btn_b01 save_btn" data="<?php echo $row['seq']?>" >이관완료</button>
+							<button type="button" class="btn btn_b01 save_btn" data="<?php echo $row['seq']?>" >이관완료<?php echo $row['seq']?></button>
 							<?php }?>
 						</div>
 		            	
@@ -249,13 +256,14 @@ $(function() {
 		
 		let id = $(this).attr('data');
 		let rack = $(this).closest('li').find('.wr_rack').val();
-	
+        let expired_date = $(this).closest('li').find('input[name^="expired_date"]').val();
+
 		if(!rack){
 			alert('랙을 선택하세요.');
 			return false;
 		}
 		
-		$.post('./stock_move_complete_update.php', { seq : id, wr_rack : rack }, function(data) {
+		$.post('./stock_move_complete_update.php', { seq : id, wr_rack : rack, expired_date : expired_date}, function(data) {
 			alert(data.message);
 			if(data.ret_code == true){
 				document.location.reload();

@@ -85,7 +85,7 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 	    <div id="bo_li_01" style="clear:both;overflow-x:scroll;overflow-y:hidden">
 	    	<ul class="list_head" style="width:100%;min-width:1700px;position:sticky;top:0;background:#fff;z-index:2;" >
 	            <li style="width:50px">순번</li>
-	            <li style="width:300px"><?php echo subject_sort_link('wr_1', $qstr2, 1) ?>SKU</a></li>
+	            <li style="width:200px"><?php echo subject_sort_link('wr_1', $qstr2, 1) ?>SKU</a></li>
             	<li style="width:300px"><?php echo subject_sort_link('wr_subject', $qstr2, 1) ?>상품명</a></li>
             	<li style="width:100px"><?php echo subject_sort_link('wr_32', $qstr2, 1) ?>한국창고</a></li>
             	<li style="width:100px"><?php echo subject_sort_link('wr_36', $qstr2, 1) ?>미국창고</a></li>
@@ -138,7 +138,7 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 					?>
 					<li class="modify" data="<?php echo $row['wr_id']?>">
 						<div class="num cnt_left" style="width:50px"><?php echo $cur_no  ?></div>
-						<div class="cnt_left tooltip" style="width:300px" title="<?=$row['wr_1']?>"><?php echo $row['wr_1'] ?></div>
+						<div class="cnt_left tooltip" style="width:200px" title="<?=$row['wr_1']?>"><?php echo $row['wr_1'] ?>b</div>
 						<div class="cnt_left tooltip" style="width:300px;" title="<?php echo $row['wr_subject'] ?>"><?php echo $row['wr_subject'] ?></div>
 						<div class="cnt_left wr_32" style="width:100px;text-align:right"><?php echo $row['wr_32']?></div>
 						<div class="cnt_left wr_36" style="width:100px;text-align:right"><?php echo $row['wr_36']?></div>

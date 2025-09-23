@@ -5,6 +5,7 @@ if(!$seq) die('n');
 
 $seq = (int)$_POST['seq'];
 $wr_rack = (int)$_POST['wr_rack'];
+$expired_date = $_POST['expired_date'];
 
 $row = sql_fetch("select * from g5_stock_move where seq = '{$seq}'");
 
@@ -34,6 +35,12 @@ if(sql_query($sql, true)) {
 		//랙 재고 입력 
 		$sql = "insert into g5_rack_stock set wr_warehouse = '{$row['wr_in_warehouse']}', wr_rack = '{$wr_rack}', wr_stock = '{$row['wr_stock']}', wr_product_id = '{$row['product_id']}', wr_mb_id = '{$member['mb_id']}', wr_datetime = '".G5_TIME_YMDHIS."', wr_move_log = '{$wr_move_log}'";
 		$result = sql_query($sql);
+
+        if (!empty($expired_date)) {
+            $sql_expired = "INSERT INTO g5_rack_expired SET rack_id = '{$wr_rack}', product_id = '{$row['product_id']}', expired_date = '{$expired_date}'";
+            sql_query($sql_expired);
+        }
+
 		if($result){
 			echo json_encode(array("ret_code"=>true,"message"=>"이관 처리가 완료되었습니다."));
 			exit;

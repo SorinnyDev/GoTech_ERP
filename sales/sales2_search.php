@@ -193,7 +193,7 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
                   <td style="text-align:right;<?php echo $ea_chk ?>"><?php echo $row['wr_order_ea'] ?></td>
                   <td style="text-align:right"><?php echo $row['wr_ea'] ?></td>
                   <td style="text-align:center">
-                      <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input">
+                      <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input" max="9999-12-31">
                   </td>
 
                   <td><?php echo $row['wr_mb_name'] ?></td>
@@ -252,7 +252,7 @@ if (!isset($nm_type) && get_cookie('nm_type')) {
         } else {
           $(this).closest('tr').find('td').removeClass('selected_line');
         }
-      })
+      });
     })
 
     function add_pop(sku, pname, wr_id) {

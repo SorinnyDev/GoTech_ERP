@@ -23,7 +23,16 @@ if (isset($warehouseConfig[$wr_warehouse])) {
     $warehouse_config = $warehouseConfig[$wr_warehouse];
     $filed = $warehouse_config['filed'];
     $filed_real = $warehouse_config['filed_real'];
-    $ware_name = $warehouse_config['ware_name'];
+
+    $ware_name = "";
+    if($warehouse_config['ware_name'] == "한국폐기창고"){
+        $ware_name ="한국 폐기창고";
+    }else if($warehouse_config['ware_name'] == "미국폐기창고"){
+        $ware_name ="미국 폐기창고";
+    }else {
+        $ware_name = $warehouse_config['ware_name'];
+    }
+
     $quality = $warehouse_config['quality']; // quality 변수도 함께 설정됩니다.
 } else {
     // 해당 $warehouse 값이 배열에 없을 경우의 처리 (선택 사항)
@@ -135,7 +144,7 @@ $chk2 = sql_fetch("select SUM(wr_stock) as qty from g5_return_stock where return
 $wr_product_state = 0;
 if ($wr_type === "양품") {
     $wr_product_state = '1';
-} elseif ($wr_type === "리퍼") {
+} elseif ($wr_type === "리퍼" || $wr_type === "폐기") {
     $wr_product_state = '2';
 
     if (in_array($wr_warehouse, ['11000', '12000'])) {
