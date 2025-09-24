@@ -273,7 +273,7 @@ $usa_seq_options = json_encode($usa_seq_array);
 								</td>
 
 								<td class="cnt_left" style="width:80px;text-align:center;">
-									<input type="date" style="width:100%;text-align:center;" name="expired[<?= $i ?>]" class="expired" value="<?= $row['expired_date'] ?>">
+									<input type="date" style="width:100%;text-align:center;" name="expired[<?= $i ?>]" class="expired" value="<?= $row['expired_date'] ?>" max="9999-12-31">
 								</td>
 
 								<td class="cnt_left" style="width:100px;text-align:center">
