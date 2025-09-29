@@ -63,29 +63,39 @@ function _rack_search($wr_id, $warehouse = '', $show_expired = false, $expired_s
     foreach ($sort_arr as $key => $value) {
         $gc_warehouse = $value['warehouse'];
 
-        // popup.report_expiration_manage.php와 동일한 로직으로 유통기한 정보 가져오기
         $sql = "
-        select rs.wr_rack, rs.wr_warehouse, wp.wr_1, wp.wr_subject, r.gc_name, rep.id as 'expired_id', wp.wr_id, rep.expired_date 
-        from g5_rack_stock as rs
-        left join g5_write_product as wp on rs.wr_product_id = wp.wr_id
-        left join g5_rack as r on r.seq = rs.wr_rack
-        left join g5_rack_expired as rep on rep.rack_id = r.seq and rep.product_id = rs.wr_product_id                                                                                                     
-        where rs.wr_product_id = '{$wr_id}' AND rs.wr_rack = '{$value['seq']}'";
+SELECT 
+    rs.wr_rack, 
+    rs.wr_warehouse, 
+    wp.wr_1, 
+    wp.wr_subject, 
+    r.gc_name, 
+    rep.id as 'expired_id', 
+    wp.wr_id, 
+    rep.expired_date,
+    SUM(rs.wr_stock) as rack_stock,
+    rs.wr_stock as rack_stock_each 
+FROM g5_rack_stock as rs
+LEFT JOIN g5_write_product as wp on rs.wr_product_id = wp.wr_id
+LEFT JOIN g5_rack as r on r.seq = rs.wr_rack
+LEFT JOIN g5_rack_expired as rep on rep.rack_id = r.seq and rep.product_id = rs.wr_product_id                                                                                                     
+WHERE rs.wr_product_id = '{$wr_id}' AND rs.wr_rack = '{$value['seq']}'
+GROUP BY rs.wr_rack, rep.expired_date
+ORDER BY rep.expired_date ASC";
+
 
         $rack_list = sql_fetch_all($sql);
 
-        $expired_date_display = '';
         foreach ($rack_list as $rack) {
             if (!empty($rack['expired_date'])) {
-                $expired_date_display = $rack['expired_date'];
-                break;
+                if ($value['is_expired']) {
+                    $result_arr .= "[" . PLATFORM_TYPE[$gc_warehouse] . "] " . $value['rack_name'] . "(주의 재고 : {$rack['rack_stock_each']}개) {$rack['expired_date']} <br>";
+                } else {
+                    $result_arr .= "[" . PLATFORM_TYPE[$gc_warehouse] . "] " . $value['rack_name'] . "(재고 : {$rack['rack_stock_each']}개) {$rack['expired_date']} <br>";
+                }
+            }else {
+                $result_arr .= "[" . PLATFORM_TYPE[$gc_warehouse] . "] " . $value['rack_name'] . "(재고 : {$rack['rack_stock_each']}개) {$rack['expired_date']}<br>";
             }
-        }
-
-        if ($value['is_expired']) {
-            $result_arr .= "[" . PLATFORM_TYPE[$gc_warehouse] . "] " . $value['rack_name'] . "(주의 재고 : {$value['total']}개) {$expired_date_display} <br>";
-        } else {
-            $result_arr .= "[" . PLATFORM_TYPE[$gc_warehouse] . "] " . $value['rack_name'] . "(재고 : {$value['total']}개) <br>";
         }
     }
     return $result_arr;

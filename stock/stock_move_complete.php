@@ -30,6 +30,8 @@ include_once(G5_THEME_PATH.'/head.php');
 a.btn_ov02,a.ov_listall{display:inline-block;line-height:30px;height:30px;font-size:0.92em;background:#565e8c;color:#fff;vertical-align:top;border-radius:5px;padding:0 7px }
 a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 
+.btn_cancel { display:inline-block; background:#f44336; padding:7px; border:0; color:#fff; text-decoration:none; }
+
 </style>
 <div id="bo_list">
 	<div class="bo_list_innr">
@@ -72,7 +74,7 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 	    	
 	    	<ul class="list_head" style="width:100%;min-width:max-content;position:sticky;top:0;background:#fff;z-index:2;" >
 	            <li style="width:200px">접수일시/이관일시</li>
-	            <li style="width:300px">SKU</li>
+	            <li style="width:250px">SKU</li>
 	            <li style="width:350px">상품명</li>
 				<li style="width:150px">이관</li>
 	            <li style="width:100px">이관수량</li>
@@ -129,7 +131,7 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 					<li class="<?php echo $bg?>">
 		            	<div class="cnt_left" style="width:200px;text-align:center">
 						<?php echo $row['wr_datetime']?></div>
-		            	<div class="cnt_left" style="width:300px"><?php echo $item['wr_1']?></div>
+		            	<div class="cnt_left" style="width:250px"><?php echo $item['wr_1']?></div>
 		            	<div class="cnt_left" style="width:350px"><?php echo $item['wr_subject']?></div>
 						<div class="cnt_left" style="width:150px"><?=$storage_arr[$row['wr_out_warehouse']]['code_nm']?> > <?=$storage_arr[$row['wr_in_warehouse']]['code_nm']?></div>
 		            	<div class="cnt_left wr_stock" style="text-align:right;width:100px"><?php echo $row['wr_stock']?></div>
@@ -164,21 +166,21 @@ a.btn_ov02:hover,a.ov_listall:hover{background:#3f51b5}
 						</div>
 
                         <div class="cnt_left" style="width:120px;text-align:center">
-
-                            <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input" max="9999-12-31">
+                                <input type="date" name="expired_date[<?php echo $row['seq'] ?>]" value="" class="frm_input" max="9999-12-31">
                         </div>
 
 		            	 <div class="cnt_left" style="width:120px;text-align:center">
 							<?php if($row['wr_state'] == 1){?>
 							<strong style="color:green;line-height:1.0em" title="<?php echo $row['wr_state_date']?>">이관완료</strong>
 							<?php } else {?>
-							<button type="button" class="btn btn_b01 save_btn" data="<?php echo $row['seq']?>" >이관완료<?php echo $row['seq']?></button>
+                            <button type="button" class="btn btn_b02 plus_btn" style="width:auto;padding:0 10px;vertical-align:middle;">추가</button>
+							<button type="button" class="btn btn_b01 save_btn" data="<?php echo $row['seq']?>" >이관완료</button>
 							<?php }?>
 						</div>
-		            	
-						
+
+
 				    </li>
-				    <?php 
+				    <?php
 					$cur_no = $cur_no - 1;
 					} ?>
 		            <?php if ($i == 0) { echo '<li class="empty_table">내역이 없습니다.</li>'; } ?>
@@ -252,26 +254,115 @@ jQuery(function($){
 </script>
 <script>
 $(function() {
-	$('.save_btn').bind('click', function() {
-		
-		let id = $(this).attr('data');
-		let rack = $(this).closest('li').find('.wr_rack').val();
-        let expired_date = $(this).closest('li').find('input[name^="expired_date"]').val();
+    // '이관완료' 버튼 클릭 이벤트
+    $('.save_btn').bind('click', function() {
+        var $clicked_li = $(this).closest('li');
+        var seq = $(this).attr('data');
+        var group_id = $clicked_li.attr('data-group-id');
+        var items = [];
+        var total_stock = 0;
+        var is_valid = true;
 
-		if(!rack){
-			alert('랙을 선택하세요.');
-			return false;
-		}
-		
-		$.post('./stock_move_complete_update.php', { seq : id, wr_rack : rack, expired_date : expired_date}, function(data) {
-			alert(data.message);
-			if(data.ret_code == true){
-				document.location.reload();
-			}
-		},'json')
-		
-	});
-})
+        var $target_lis;
+        if (group_id) {
+            // '추가'로 그룹이 생성된 경우
+            $target_lis = $('li[data-group-id="' + group_id + '"]');
+        } else {
+            // 단일 항목 처리
+            $target_lis = $clicked_li;
+        }
+
+        var original_stock = parseFloat($target_lis.first().attr('data-original-stock') || $target_lis.first().find('.wr_stock').text());
+
+        $target_lis.each(function() {
+            var $li = $(this);
+            var stock_val = $li.find('.wr_stock_input').length ? $li.find('.wr_stock_input').val() : $li.find('.wr_stock').text();
+            var stock = parseFloat(stock_val) || 0;
+            var rack = $li.find('.wr_rack').val();
+            var expired_date = $li.find('input[name^="expired_date"]').val();
+
+            if (stock <= 0) {
+                alert('이관수량을 1 이상 입력해주세요.');
+                $li.find('.wr_stock_input').focus();
+                is_valid = false;
+                return false; // .each 루프 중단
+            }
+
+            if (!rack) {
+                alert('랙을 선택하세요.');
+                $li.find('.wr_rack').focus();
+                is_valid = false;
+                return false; // .each 루프 중단
+            }
+
+            total_stock += stock;
+
+            items.push({
+                wr_stock: stock,
+                wr_rack: rack,
+                expired_date: expired_date
+            });
+        });
+
+        if (!is_valid) {
+            return;
+        }
+
+        // 분할된 수량의 합계가 원래 수량을 초과하는지 확인
+        if (total_stock > original_stock) {
+            alert('총 이관수량(' + total_stock + ')이 원래 수량(' + original_stock + ')을 초과할 수 없습니다.');
+            return;
+        }
+
+        // 모든 데이터가 유효하면 서버로 전송
+        $.post('./stock_move_complete_update.php', { seq: seq, items: items }, function(data) {
+            alert(data.message);
+            if (data.ret_code == true) {
+                document.location.reload();
+            }
+        }, 'json');
+    });
+
+    var group_id_counter = 0;
+    $('.plus_btn').bind('click', function() {
+
+        var $original_li = $(this).closest('li');
+        // 그룹 ID가 없으면 새로 부여
+        if (!$original_li.attr('data-group-id')) {
+            group_id_counter++;
+            $original_li.attr('data-group-id', 'group-' + group_id_counter);
+
+            // 원본 수량을 data 속성에 저장
+            var $original_stock_div = $original_li.find('.wr_stock');
+            var original_stock_val = $.trim($original_stock_div.text());
+            $original_li.attr('data-original-stock', original_stock_val);
+
+            // 수량 필드를 input으로 변경
+            var stock_input = '<input type="text" class="wr_stock_input frm_input" style="width:100%; text-align:right;" value="' + original_stock_val + '">';
+            $original_stock_div.html(stock_input);
+        }
+
+        var group_id = $original_li.attr('data-group-id');
+        var $clone_li = $original_li.clone();
+
+        // 복제된 줄 초기화
+        $clone_li.attr('data-group-id', group_id); // 같은 그룹 ID 부여
+        $clone_li.find('.wr_stock_input').val('').focus(); // 수량 비우고 포커스
+        $clone_li.find('select.wr_rack').val(''); // 랙 선택 비우기
+        $clone_li.find('input[name^="expired_date"]').val(''); // 유통기한 비우기
+
+        // '추가', '이관완료' 버튼을 '삭제' 버튼으로 교체
+        var $delete_btn = $('<button type="button" class="btn btn_cancel delete_btn" style="width:auto;padding:0 10px;vertical-align:middle;">삭제</button>');
+        $clone_li.find('.plus_btn, .save_btn').parent().html($delete_btn);
+
+        $original_li.after($clone_li);
+
+    });
+
+    $(document).on('click', '.delete_btn', function() {
+        $(this).closest('li').remove();
+    });
+});
 
 </script>
 

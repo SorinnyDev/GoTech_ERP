@@ -12,11 +12,14 @@ $seq_list = explode(',', $seqs);
 $product_rack_list = [];
 foreach ($seq_list as $seq) {
     $sql = "
-    select rs.wr_rack, rs.wr_warehouse, wp.wr_1, wp.wr_subject, r.gc_name, rep.id as 'expired_id', wp.wr_id, rep.expired_date from g5_rack_stock as rs
+    select rs.wr_rack, rs.wr_warehouse, wp.wr_1, wp.wr_subject, r.gc_name, rep.id as 'expired_id', wp.wr_id, rep.expired_date,
+           rs.wr_stock as rack_stock_each  
+    from g5_rack_stock as rs
     left join g5_write_product as wp on rs.wr_product_id = wp.wr_id
     left join g5_rack as r on r.seq = rs.wr_rack
     left join g5_rack_expired as rep on rep.rack_id = r.seq and rep.product_id = rs.wr_product_id                                                                                                     
-    where rs.wr_product_id = '{$seq}'  
+    where rs.wr_product_id = '{$seq}' 
+    GROUP BY rs.wr_rack, rep.expired_date
   ";
     $rack_list = sql_fetch_all($sql);
 
@@ -29,25 +32,31 @@ foreach ($seq_list as $seq) {
         $gc_name = $rack['gc_name'];
         $expired_date = $rack['expired_date'];
         $gc_is_expired = !!$rack['expired_id'];
+        $rack_stock_each = $rack['rack_stock_each'];
 
-        $sql = "SELECT SUM(wr_stock) AS total FROM g5_rack_stock WHERE wr_product_id = '{$seq}' AND wr_rack = '{$wr_rack}' ORDER BY seq ASC ";
+        $sql = "SELECT SUM(wr_stock) AS total FROM g5_rack_stock as rs
+                              WHERE wr_product_id = '{$seq}' AND wr_rack = '{$wr_rack}'
+                              ORDER BY seq ASC ";
+
         $total = sql_fetch($sql)['total'];
 
         if($total > 0){
-            $product_rack_list[$wr_rack]['warehouse'] = PLATFORM_TYPE[$warehouse];
-            $product_rack_list[$wr_rack]['rack_name'] = $gc_name;
-            $product_rack_list[$wr_rack]['seq'] = $wr_rack;
-            $product_rack_list[$wr_rack]['total'] = number_format($total);
-            $product_rack_list[$wr_rack]['product_nm'] = $subject;
-            $product_rack_list[$wr_rack]['product_id'] = $product_id;
-            $product_rack_list[$wr_rack]['sku'] = $sku;
-            $product_rack_list[$wr_rack]['is_expired'] = $gc_is_expired;
-            $product_rack_list[$wr_rack]['expired_date'] = $expired_date;
+
+            $unique_key = $wr_rack . '_' . ($expired_date ? str_replace('-', '', $expired_date) : 'no_date');
+
+            $product_rack_list[$unique_key]['warehouse'] = PLATFORM_TYPE[$warehouse];
+            $product_rack_list[$unique_key]['rack_name'] = $gc_name;
+            $product_rack_list[$unique_key]['seq'] = $wr_rack;
+            $product_rack_list[$unique_key]['total'] = number_format($total);
+            $product_rack_list[$unique_key]['product_nm'] = $subject;
+            $product_rack_list[$unique_key]['product_id'] = $product_id;
+            $product_rack_list[$unique_key]['sku'] = $sku;
+            $product_rack_list[$unique_key]['is_expired'] = $gc_is_expired;
+            $product_rack_list[$unique_key]['expired_date'] = $expired_date;
+            $product_rack_list[$unique_key]['rack_stock_each'] = $rack_stock_each;
         }
     }
 }
-
-
 ?>
 
     <style>
@@ -156,15 +165,16 @@ foreach ($seq_list as $seq) {
                         </tr>
                         </thead>
                         <tbody>
+
                         <?php foreach ($product_rack_list as $k => $row) {
                             $bg = 'bg' . ($row['is_expired'] ? '1' : '0');
                             ?>
-
                             <tr class="<?php echo $bg; ?>">
                                 <td><?php echo $row['sku'] ?></td>
                                 <td><?php echo $row['product_nm'] ?></td>
                                 <td>[<?= $row['warehouse']; ?>] <?= $row['rack_name']; ?></td>
-                                <td><?php echo number_format($row['total']) ?></td>
+                                <!-- <td><?php echo number_format($row['total']) ?></td> -->
+                                <td><?php echo number_format($row['rack_stock_each']) ?></td>
                                 <td>
                                     <input type="date" name="expired_date" value="<?= $row['expired_date'] ?>" class="sch_input" size="25"
                                            maxlength="20" placeholder="" style="text-align:center">
