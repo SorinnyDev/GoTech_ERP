@@ -219,6 +219,13 @@ if (!$date2) {
 						if (isset($sc_domain) && isNotEmpty($sc_domain)) {
 							$sql_search .= " and s3.wr_domain = '$sc_domain' ";
 						}
+                        if (isset($sc_warehouse) && isNotEmpty($sc_warehouse)) {
+                            $sql_search .= " and EXISTS (
+                                            SELECT 1 FROM g5_return_stock rs 
+                                            WHERE rs.return_id = l.seq 
+                                            AND rs.wr_warehouse = '$sc_warehouse'
+                                        ) ";
+                        }
 
 						if (!$sst && !$sod) {
 							$sst = "l.seq";
@@ -338,6 +345,16 @@ if (!$date2) {
 			<div style="margin-bottom: 15px; width: 100%; display: flex; align-items: center;">
 				<input type="text" name="stx" value="<?php echo urldecode($_GET['stx']) ?>" class="frm_input" style="width:100%;" placeholder="주문번호로 검색">
 			</div>
+            <label for="stx" style="font-weight:bold">창고 조회</label>
+            <select name="sc_warehouse" class="search_sel" style="width:100%;">
+                    <option value="">이관 창고 선택</option>
+                    <option value="한국반품창고">한국반품창고</option>
+                    <option value="미국반품창고">미국반품창고</option>
+                    <option value="한국폐기창고">한국폐기창고</option>
+                    <option value="미국폐기창고">미국폐기창고</option>
+            </select>
+
+            
 			<label for="stx" style="font-weight:bold">일자 조회<strong class="sound_only"> 필수</strong></label>
 			<div class="sch_bar" style="margin-bottom: 15px; width: 100%; display: flex; align-items: center; margin-top: 0;">
 				<input type="date" name="date1" value="<?php echo $date1 ?>" required id="stx" class="sch_input" size="25" maxlength="20" placeholder="" style="width:45%;text-align:center">

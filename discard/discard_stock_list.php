@@ -36,10 +36,17 @@ if ($warehouse) {
 }
 
 $query = "
-  select dl.id, dl.wr_datetime, dl.wr_stock, wr_subject, wr_1, wp.wr_5, ds.wr_warehouse, ds.wr_rack, dl.wr_memo, dl.product_id, di.id as 'img_id', di.wr_img1, (wp.wr_22 * dl.wr_stock) as stock_price from g5_discard_list as dl
+  select dl.id, dl.wr_datetime, dl.wr_stock, wr_subject, wr_1, wp.wr_5, ds.wr_warehouse, ds.wr_rack, dl.wr_memo, dl.product_id, di.id as 'img_id', di.wr_img1, 
+  (wp.wr_22 * dl.wr_stock) as stock_price, rl.wr_order_num , sl3.wr_domain
+ 
+  from g5_discard_list as dl
   left join g5_write_product as wp on wp.wr_id = dl.product_id
   left join g5_discard_img as di on di.discard_id = dl.id  
   left join g5_discard_stock as ds on ds.discard_id = dl.id
+      
+  left join g5_return_list as rl on rl.product_id = dl.product_id
+  left join g5_sales3_list as sl3 on  sl3.seq = rl.sales3_id 
+  
   where {$where}                                                                                                                
   group by dl.id
   order by dl.wr_datetime desc
@@ -78,13 +85,15 @@ include_once(G5_THEME_PATH . '/head.php');
           <table>
             <thead>
             <tr>
+              <th>도메인</th>
               <th>폐기일자</th>
-              <th>대표코드</th>
+              <th>주문번호</th>
+              <th>대표코드 SKU</th>
               <th>제품명</th>
               <th style="width: 70px;">제품단가</th>
               <th>창고</th>
               <th>사진</th>
-              <th>메모</th>
+              <th>비고</th>
               <th>수량</th>
               <th>관리</th>
             </tr>
@@ -92,8 +101,10 @@ include_once(G5_THEME_PATH . '/head.php');
             <tbody>
             <?php foreach ($list as $k => $item) { ?>
               <tr>
+                <td style="text-align: center;"><?= $item['wr_domain'] ?></td>
                 <td style="text-align: center;"><?= $item['wr_datetime'] ?></td>
-                <td><?= $item['wr_5'] ?? $item['wr_subject'] ?></td>
+                <td style="text-align: center;"><?= $item['wr_order_num'] ?></td>
+                <td><?= $item['wr_5'] ?></td>
                 <td><?= $item['wr_subject'] ?></td>
                 <td style="text-align: center;"><?= number_format($item['stock_price']) ?></td>
                 <td style="text-align: center;">
